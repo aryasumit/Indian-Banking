@@ -9,6 +9,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 # Create raw data path
 Raw_data_path = "C:\DATA\Portfolio\Indian Banking\Indian-Banking\data"
@@ -60,8 +61,8 @@ def clean_data(x):
     x['Banks'].replace(regex=['JPMORGAN'], value='JP MORGAN', inplace=True)
     x['Banks'].replace(regex=['RBL BANK LIMITED'], value='RBL', inplace=True)
     x['Banks'].replace(regex=['& JAIPUR'], value='AND JAIPUR', inplace=True)
-    x['Banks'].replace(regex=['CORP.'], value='AND JAIPUR', inplace=True)
-    x['Banks'].replace(regex=['LIMITED'], value='AND JAIPUR', inplace=True)
+    x['Banks'].replace(regex=['CORP.'], value='', inplace=True)
+    x['Banks'].replace(regex=['LIMITED'], value='', inplace=True)
     x['Banks'].replace(regex=['MUFG Bank Ltd'], value='MUFG BANK', inplace=True)
     x['Banks'].replace(regex=['THE DHANALAKSHMI BANK'], value='DHANALAKSHMI BANK', inplace=True)
     
@@ -85,6 +86,34 @@ Adv_2019 = cln_assets[cln_assets['Year']==2019]
 # Adv_2019['7.     Advances'] = Adv_2019['7.     Advances'].astype(float)
 Adv_2019['7.     Advances'] = pd.to_numeric(Adv_2019['7.     Advances'] ,errors='coerce')
 Adv_2019_bank_type = Adv_2019.groupby(['Bank type_x'])['7.     Advances'].agg('sum')
+Adv_2019_bank_type = pd.DataFrame(Adv_2019_bank_type)
+Adv_2019_bank_type.reset_index(inplace=True)
+
+sns.set_style(style="whitegrid")
+
+penguins = sns.load_dataset("penguins")
+
+# Draw a nested barplot by species and sex
+plt.figure(figsize=(12,12)) 
+g = sns.catplot(
+    data=Adv_2019_bank_type, kind="bar",
+    x="Bank type_x", y="7.     Advances",
+    ci="sd", palette="dark", alpha=.9, height=6
+)
+g.set_xticklabels(g.get_xticklabels(), rotation=40, ha="right")
+g.despine(left=True)
+g.set_axis_labels("", "Advances")
+plt.show()
+g.legend.set_title("")
+
+Adv_2019_bank_type.sort_values( by = '7.     Advances', inplace=True,  ascending=False)
+ax = sns.barplot(x="Bank type_x", y= "7.     Advances", data=Adv_2019_bank_type)
+ax.set_xticklabels(ax.get_xticklabels(), rotation=30, ha="right")
+ax.set(xlabel='Bank Type', ylabel='Advances', title='Advances by bank type')
+plt.tight_layout()
+plt.show()
+
+
 
 df = pd.DataFrame({'mass': [0.330, 4.87 , 5.97],
                    'radius': [2439.7, 6051.8, 6378.1]},
